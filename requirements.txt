@@ -1,0 +1,9 @@
+dynaconf[all]
+pandas
+msgpack
+prefect
+loguru
+overrides
+tqdm
+regex
+sklearn

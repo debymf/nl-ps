@@ -1,0 +1,4 @@
+[default]
+    xml_input = './data/wiki.xml'
+[test]
+    xml_input = './data/wiki.xml'

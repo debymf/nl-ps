@@ -1,0 +1,1 @@
+from .generate_pairs_task import GeneratePairsTask
