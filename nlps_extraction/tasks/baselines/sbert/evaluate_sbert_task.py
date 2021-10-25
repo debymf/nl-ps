@@ -10,6 +10,10 @@ class EvaluateSBertTask(Task):
     def get_closest(
         conjecture_embedding, statements_embedding, score_function=util.cos_sim
     ):
+        print(type(conjecture_embedding))
+
+        print(type(statements_embedding))
+        input()
 
         retrieved = util.semantic_search(
             conjecture_embedding,
