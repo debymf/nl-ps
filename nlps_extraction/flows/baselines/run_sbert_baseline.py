@@ -9,9 +9,9 @@ cache_args = dict(
 )
 
 
-read_input_files = ReadPSInput(**cache_args)
-tokenize_data = CustomTokenizeInput(**cache_args)
-encode_kb_task = GenerateKBSBertTask(**cache_args)
+read_input_files = ReadPSInput()
+tokenize_data = CustomTokenizeInput()
+encode_kb_task = GenerateKBSBertTask()
 evaluation_task = EvaluateSBertTask()
 
 MODEL = "sentence-transformers/all-mpnet-base-v2"
