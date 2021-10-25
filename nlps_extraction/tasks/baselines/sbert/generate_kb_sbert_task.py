@@ -12,12 +12,13 @@ class GenerateKBSBertTask(Task):
         logger.info("** Embedding KB **")
         embedding_kb = dict()
 
+        titles_embedding = list(input_data.keys())
         embedding_kb_output = model.encode(
             list(input_data.values()), show_progress_bar=True
         )
 
-        print(type(embedding_kb_output))
-        input()
+        for title, embedding in zip(titles_embedding, embedding_kb_output):
+            embedding_kb[title] = embedding
 
         return embedding_kb
 

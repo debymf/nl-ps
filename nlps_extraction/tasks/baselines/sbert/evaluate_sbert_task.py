@@ -14,7 +14,6 @@ class EvaluateSBertTask(Task):
 
         return retrieved
 
-    @staticmethod
     def get_map(self, statements, kb, score_function):
         for title, content in tqdm(statements.items()):
             retrieved = self.get_closest(content[title], kb, score_function)[0]
