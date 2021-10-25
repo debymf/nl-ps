@@ -21,20 +21,20 @@ class EvaluateTFIDFTask(Task):
         actual_results_list = list()
         for title, content in statements.items():
             retrieval_results_list.append(list(retrieval_results[title].keys()))
-            actual_results_list.append(content["premises"])
+            actual_results_list.append([str(p) for p in content["premises"]])
             premises = content["premises"]
-            for r in retrieval_results[title]:
-                print(r)
-                print(type(r))
-                input()
-                break
-            for p in premises:
-                print("Premise")
-                print(type(p))
-                print(p)
-                print("Index")
-                print(retrieval_results_list.index(p))
-                input()
+            # for r in retrieval_results[title]:
+            #     print(r)
+            #     print(type(r))
+            #     input()
+            #     break
+            # for p in premises:
+            #     print("Premise")
+            #     print(type(p))
+            #     print(p)
+            #     print("Index")
+            #     print(retrieval_results_list.index(p))
+            #     input()
 
         map_value = metrics.mapk(actual_results_list, retrieval_results_list, len(kb))
 
