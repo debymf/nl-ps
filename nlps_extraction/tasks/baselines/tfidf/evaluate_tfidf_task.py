@@ -23,7 +23,7 @@ class EvaluateTFIDFTask(Task):
             retrieval_results_list.append(list(retrieval_results[title].keys()))
             actual_results_list.append(content["premises"])
             premises = content["premises"]
-            for r in retrieval_results_list:
+            for r in retrieval_results[title]:
                 print(r)
                 print(type(r))
                 input()
