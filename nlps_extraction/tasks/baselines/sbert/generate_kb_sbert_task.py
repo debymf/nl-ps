@@ -14,7 +14,7 @@ class GenerateKBSBertTask(Task):
 
         titles_embedding = list(input_data.keys())
         embedding_kb_output = model.encode(
-            list(input_data.values()), show_progress_bar=True
+            list(input_data.values()), show_progress_bar=True, convert_to_tensor=True
         )
 
         for title, embedding in zip(titles_embedding, embedding_kb_output):
