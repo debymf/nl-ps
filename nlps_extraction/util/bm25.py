@@ -152,7 +152,7 @@ class BM25Fit:
 
 
 class BM25Search:
-    def run(self, query_input: Dict, ix, limit=300):
+    def run(self, query_input: Dict, ix, limit=30000):
         vectorizer, transformed_corpus, ids = ix
         query_output = {}
         for id, query in tqdm(query_input.items(), "Querying"):

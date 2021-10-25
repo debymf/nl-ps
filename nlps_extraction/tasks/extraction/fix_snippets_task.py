@@ -51,6 +51,7 @@ class FixSnippetsTask(Task):
                     content = content.replace(
                         "{{:" + m + "}}", raw_content[m].onlyinclude
                     )
+
                 else:
                     content = content.replace("{{:" + m + "}}", "")
             new_entries[title] = content.replace("<onlyinclude>", "").replace(

@@ -14,9 +14,7 @@ from nlps_extraction.tasks.extraction import (
 )
 
 cache_args = dict(
-    target="{task_name}.pkl",
-    checkpoint=True,
-    result=LocalResult(dir=f"./cache/"),
+    target="{task_name}.pkl", checkpoint=True, result=LocalResult(dir=f"./cache/"),
 )
 
 parser_task = XMLParserTask(**cache_args)
@@ -26,7 +24,10 @@ get_categories_task = GetCategoriesTask(**cache_args)
 curate_titles_task = CurateTitlesTask(**cache_args)
 get_definitions_task = GetDefinitionsTask(**cache_args)
 get_others_task = GetOthersTask(**cache_args)
-generate_output_task = GenerateOutputTask(**cache_args)
+generate_output_task = GenerateOutputTask()
+
+
+# generate_output_task = GenerateOutputTask()
 
 
 with Flow("Run extraction flow") as flow:

@@ -126,6 +126,10 @@ class GetDefinitionsTask(Task):
                     new_premises.append(p)
             definitions[title] = [category, content, premises]
 
+        for title, content in definitions.items():
+            print(title)
+            print(content)
+
         results = {"definitions": definitions, "others": others}
 
         return results

@@ -12,7 +12,7 @@ class FixRedirectsTask(Task):
 
         entries, redirects = self.find_and_remove_redirect(entries)
 
-        redirects = self.solve_dependencies_redirects(redirects)
+        # redirects = self.solve_dependencies_redirects(redirects)
 
         entries = self.replace_redirects(entries, redirects)
 
@@ -63,9 +63,17 @@ class FixRedirectsTask(Task):
 
         logger.info("*** Solving dependecies between redirects ***")
         for start, end in tqdm(redirects):
-            for i in range(0, len(redirects)):
-                if redirects[i][1] == start:
-                    redirects[i] = (redirects[i][0], end)
+            if start != end:
+                for i in range(0, len(redirects)):
+                    if redirects[i][1] == start:
+                        print("The one to be fixed")
+                        print(f"start: {redirects[i][0]}")
+                        print(f"end: {redirects[i][1]}")
+                        print("The one to being checked")
+                        print(f"start: {start}")
+                        print(f"end: {end}")
+                        input()
+                        redirects[i] = (redirects[i][0], end)
 
         return redirects
 
@@ -78,12 +86,30 @@ class FixRedirectsTask(Task):
 
         :return: entries without redirects.
         """
-        logger.info("*** Replacing redirects (This might take some time...) ***")
-        new_entries = dict()
+        logger.info(
+            "*** Replacing redirects (This might take some time - This code is not optimized...) ***"
+        )
+
         for start, end in tqdm(redirects):
             for title, content in entries.items():
-                if start in content:
-                    new_entries[title] = content.replace(start, end)
+
+                if "{{" + start + "}}" in content:
+                    entries[title] = entries[title].replace(
+                        "{{" + start + "}}", "{{" + end + "}}"
+                    )
+
+                if "{{:" + start + "}}" in content:
+                    entries[title] = entries[title].replace(
+                        "{{:" + start + "}}", "{{:" + end + "}}"
+                    )
+
+                if f"[[{start}]]" in content:
+                    entries[title] = entries[title].replace(
+                        f"[[{start}]]", f"[[{end}]]"
+                    )
+                if f"[[{start}|" in content:
+                    entries[title] = entries[title].replace(f"[[{start}|", f"[[{end}|")
+
         return entries
 
     def treat_specific_cases_redirect(self, title):
