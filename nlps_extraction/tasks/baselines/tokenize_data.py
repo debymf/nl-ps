@@ -10,7 +10,7 @@ from nlps_extraction.util import (
 
 
 class CustomTokenizeInput(Task):
-    def run(self, input_data, expression_as_words=True):
+    def run(self, input_data, expression_as_words=False):
         tokenized_input = dict()
 
         tokenized_input["kb"] = dict()
