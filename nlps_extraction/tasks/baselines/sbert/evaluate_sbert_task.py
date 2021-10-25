@@ -16,7 +16,8 @@ class EvaluateSBertTask(Task):
 
     def get_map(self, statements, kb, score_function):
         for title, content in tqdm(statements.items()):
-
+            print(type(title))
+            input()
             retrieved = self.get_closest(kb[title], kb, score_function)[0]
             retrieved_index = [result["corpus_id"] for result in retrieved]
             premises = content["premises"]
