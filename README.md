@@ -2,10 +2,9 @@
 
 Welcome :smile:
 
-This is the code used for generating the PS-ProofWiki. A dataset for Premise Selection in mathematical texts. 
+This is the code used for generating the PS-ProofWiki. A dataset for Premise Selection in mathematical texts.
 
 Paper: Deborah Ferreira, André Freitas, Natural Language Premise Selection: Finding Supporting Statements for Mathematical Texts, 12th Language Resources and Evaluation Conference (LREC), Marseille, France, 2020 (Language Resource Paper). [<pdf>](https://arxiv.org/abs/2004.14959)
-
 
 ## Dataset
 
@@ -41,17 +40,23 @@ After you installed all the requirements, run the extraction with
 This will generate the files:
 
 ```
-/output/theorems.json
-/output/lemmas.json
-/output/corollaries.json
-/output/definitions.json
+/output/train.json
+/output/test.json
+/output/dev.json
+/output/kb.json
 ```
 
-In order to generate the dataset for train/test/dev, run the following command:
+## Running Baselines
+
+TF-IDF
 
 ```
- python -m nlps_extraction.flows.generate_pairs
+python -m nlps_extraction.flows.baselines.run_tfidf_experiment
 ```
+
+Doc2Vec
+
+S-Bert
 
 ## Citation
 
