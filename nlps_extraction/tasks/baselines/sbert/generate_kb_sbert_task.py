@@ -5,9 +5,9 @@ from tqdm import tqdm
 
 
 class GenerateKBSBertTask(Task):
-    def run(self, input_data, model):
+    def run(self, input_data, model_name):
         logger.info("** Converting Sentences to Vector **")
-        model = SentenceTransformer(model)
+        model = SentenceTransformer(model_name)
 
         logger.info("** Embedding KB **")
         embedding_kb = dict()
