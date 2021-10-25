@@ -18,7 +18,7 @@ class GenerateKBSBertTask(Task):
         )
 
         for title, embedding in zip(titles_embedding, embedding_kb_output):
-            print(title)
+            print(type(title))
             print(embedding)
             input()
             embedding_kb[title] = embedding
