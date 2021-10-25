@@ -3,6 +3,7 @@ from loguru import logger
 from sentence_transformers import SentenceTransformer, util
 from tqdm import tqdm
 import ml_metrics as metrics
+import torch
 
 
 class EvaluateSBertTask(Task):
@@ -10,13 +11,9 @@ class EvaluateSBertTask(Task):
     def get_closest(
         conjecture_embedding, statements_embedding, score_function=util.cos_sim
     ):
-        print(type(conjecture_embedding))
-
-        print(type(statements_embedding))
-        input()
 
         retrieved = util.semantic_search(
-            conjecture_embedding,
+            torch.Tensor(conjecture_embedding),
             list(statements_embedding.values()),
             score_function=score_function,
             top_k=5,
