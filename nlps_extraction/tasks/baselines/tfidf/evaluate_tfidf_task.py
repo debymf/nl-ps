@@ -8,7 +8,7 @@ import ml_metrics as metrics
 
 
 class EvaluateTFIDFTask(Task):
-    def get_retrieved_premises(self, statements, ix):
+    def get_retrieved_premises(self, statements, ix, kb):
         search_class = BM25Search()
         text_only = {
             key_title: statements[key_title]["text"]
@@ -29,7 +29,7 @@ class EvaluateTFIDFTask(Task):
             # input()
 
         map_value = metrics.mapk(
-            actual_results_list, retrieval_results_list, len(statements)
+            actual_results_list, retrieval_results_list, len(kb)
         )
 
         logger.info(f"mAP: {map_value}")
@@ -38,10 +38,10 @@ class EvaluateTFIDFTask(Task):
         search_class = BM25Search()
 
         logger.info("Test set:")
-        self.get_retrieved_premises(input_data["test"], ix)
+        self.get_retrieved_premises(input_data["test"], ix, input_data["kb"])
 
         logger.info("Dev set:")
-        self.get_retrieved_premises(input_data["dev"], ix)
+        self.get_retrieved_premises(input_data["dev"], ix, input_data["kb"])
 
         return ix
 
