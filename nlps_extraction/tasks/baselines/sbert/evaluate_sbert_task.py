@@ -7,17 +7,26 @@ import ml_metrics as metrics
 
 class EvaluateSBertTask(Task):
     @staticmethod
-    def get_closest(question_embedding, facts_embedding, score_function=util.cos_sim):
+    def get_closest(
+        conjecture_embedding, statements_embedding, score_function=util.cos_sim
+    ):
+
         retrieved = util.semantic_search(
-            question_embedding, facts_embedding, score_function=score_function, top_k=5
+            conjecture_embedding,
+            list(statements_embedding.values()),
+            score_function=score_function,
+            top_k=5,
         )
+
+        print(retrieved)
+        input()
+
+        all_titles = list(statements_embedding.keys())
 
         return retrieved
 
     def get_map(self, statements, kb, score_function):
         for title, content in tqdm(statements.items()):
-            print(kb[title])
-            input()
 
             retrieved = self.get_closest(kb[title], kb, score_function)[0]
             retrieved_index = [result["corpus_id"] for result in retrieved]
