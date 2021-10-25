@@ -18,9 +18,11 @@ class GenerateKBSBertTask(Task):
         )
 
         for title, embedding in zip(titles_embedding, embedding_kb_output):
-            print(type(title))
-            print(embedding)
-            input()
+            if title == "141924624631035250296088165205000358802":
+
+                print(type(title))
+                print(embedding)
+                input()
             embedding_kb[title] = embedding
 
         return embedding_kb
