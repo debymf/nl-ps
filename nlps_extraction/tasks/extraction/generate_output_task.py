@@ -48,6 +48,7 @@ class GenerateOutputTask(Task):
                         if p in title_to_id:
                             filtered_premises.append(title_to_id[p])
 
+                    
                     if filtered_premises:
                         new_id = title_to_id[title]
                         conjectures[new_id] = dict()
@@ -57,7 +58,7 @@ class GenerateOutputTask(Task):
                         )
 
                         conjectures[new_id]["premises"] = filtered_premises
-
+            
             return conjectures, content_to_id
 
         title_to_id = dict()
@@ -90,6 +91,25 @@ class GenerateOutputTask(Task):
         conjectures, content_to_id = prepare_conjectures(
             corollaries, conjectures, content_to_id, title_to_id
         )
+
+        for title_id, content in conjectures.items():
+            premises = content["premises"]
+            added_premises = list()
+            for p in premises:
+                if p in conjectures:
+                    added_premises.extend(conjectures[p]["premises"])
+            premises.extend(added_premises)
+            conjectures[title_id]["premises"] = list(set(premises))
+
+        # for title_id, content in conjectures.items():
+        #     premises = content["premises"]
+            
+        #     added_premises = list()
+        #     for p in premises:
+        #         if p in conjectures:
+        #             added_premises.extend(conjectures[p]["premises"])
+        #     premises.extend(added_premises)
+        #     conjectures[title_id]["premises"] = list(set(premises))
 
         logger.info(f"Number of Conjecures: {len(conjectures)}")
         logger.info(f"KB size: {len(kb)}")
@@ -146,6 +166,32 @@ class GenerateOutputTask(Task):
         logger.info(f"Test Data: {len(test_data)}")
         return training_data, dev_data, test_data
 
+    def remove_eval_from_kb(self,kb, train, dev, test):
+        def fix_split(split, kb):
+            new_split = dict()
+            for title_id, content in split.items():
+                premises_list = list()
+                for p in content["premises"]:
+                    if p in kb:
+                        premises_list.append(p)
+                if premises_list:
+                    new_split[title_id] = content
+                    new_split[title_id]["premises"] = premises_list
+
+            return new_split
+
+        for id_title, _ in test.items():
+            del kb[id_title]
+
+        for id_title, _ in dev.items():
+            del kb[id_title]
+
+        new_test = fix_split(test, kb)
+        new_train = fix_split(train, kb)
+        new_dev = fix_split(dev, kb)
+
+        return new_train, new_dev, new_test, kb
+        
     def run(self, definitions, lemmas, corollaries, theorems):
         definitions, lemmas, corollaries, theorems = self.organise_input(
             definitions, lemmas, corollaries, theorems
@@ -153,6 +199,20 @@ class GenerateOutputTask(Task):
         conjectures, kb = self.create_kb(definitions, lemmas, corollaries, theorems)
 
         train, dev, test = self.split_data(conjectures)
+
+        logger.info("DATA BEFORE CLEANING")
+        logger.info(f"Training Data: {len(train)}")
+        logger.info(f"Dev Data: {len(dev)}")
+        logger.info(f"Test Data: {len(test)}")
+        logger.info(f"KB Data: {len(kb)}")
+
+        train, dev, test, kb = self.remove_eval_from_kb(kb, train, dev, test)
+
+        logger.info("DATA AFTER CLEANING")
+        logger.info(f"Training Data: {len(train)}")
+        logger.info(f"Dev Data: {len(dev)}")
+        logger.info(f"Test Data: {len(test)}")
+        logger.info(f"KB Data: {len(kb)}")
 
         with open(f"./output/test.json", "w") as f:
             json.dump(test, f)

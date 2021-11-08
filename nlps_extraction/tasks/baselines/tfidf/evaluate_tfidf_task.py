@@ -3,8 +3,9 @@ from dynaconf import settings
 from loguru import logger
 from tqdm import tqdm
 import json
-from nlps_extraction.util import BM25Fit, BM25Search
-import ml_metrics as metrics
+from nlps_extraction.util import BM25Fit, BM25Search, compute_mean_average_precision
+
+
 
 
 class EvaluateTFIDFTask(Task):
@@ -17,26 +18,18 @@ class EvaluateTFIDFTask(Task):
 
         retrieval_results = search_class.run(text_only, ix)
 
+
         retrieval_results_list = list()
         actual_results_list = list()
         for title, content in statements.items():
             retrieval_results_list.append(list(retrieval_results[title].keys()))
             actual_results_list.append([str(p) for p in content["premises"]])
-            premises = content["premises"]
-            # for r in retrieval_results[title]:
-            #     print(r)
-            #     print(type(r))
-            #     input()
-            #     break
-            # for p in premises:
-            #     print("Premise")
-            #     print(type(p))
-            #     print(p)
-            #     print("Index")
-            #     print(retrieval_results_list.index(p))
-            #     input()
 
-        map_value = metrics.mapk(actual_results_list, retrieval_results_list, len(kb))
+            
+            premises = content["premises"]
+            
+
+        map_value = compute_mean_average_precision(actual_results_list, retrieval_results_list)
 
         logger.info(f"mAP: {map_value}")
 

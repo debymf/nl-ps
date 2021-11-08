@@ -18,7 +18,7 @@ MODEL = "sentence-transformers/all-mpnet-base-v2"
 with Flow("Running S-BERT baselines") as flow:
     input_files = read_input_files()
     encoded_kb = encode_kb_task(input_files["kb"], MODEL)
-    evaluation_task(input_files, encoded_kb)
+    evaluation_task(input_files, encoded_kb, model_name=MODEL)
 
 
 FlowRunner(flow=flow).run()
