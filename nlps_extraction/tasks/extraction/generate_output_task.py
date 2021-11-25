@@ -13,22 +13,25 @@ OUTPUT_FOLDER = "./output/"
 
 class GenerateOutputTask(Task):
     def create_kb(self, definitions, lemmas, corollaries, theorems):
-        def add_elements_to_kb(statements, kb, title_to_id, content_kb_list):
+        def add_elements_to_kb(statements, kb, title_to_id, content_kb_list, type):
             content_kb_list = dict()
             for title, content in statements.items():
-                new_id = uuid.uuid4().int
+                new_id = str(uuid.uuid4())
                 if content["content"] in content_kb_list:
                     matching_title = content_kb_list[content["content"]]
                     title_to_id[title] = title_to_id[matching_title]
                 else:
                     content_kb_list[content["content"]] = title
-                    kb[new_id] = content["content"].strip()
-                    kb[new_id] = regex.sub("\\n+", "\\n", kb[new_id])
+                    kb[new_id] = dict()
+                    kb[new_id]["text"] = content["content"].strip()
+                    kb[new_id]["text"] = regex.sub("\\n+", "\\n", kb[new_id]["text"])
+                    kb[new_id]["type"] =  type
+                    kb[new_id]["category"] = content["category"]
                     title_to_id[title] = new_id
 
             return kb, title_to_id, content_kb_list
 
-        def prepare_conjectures(statements, conjectures, content_to_id, title_to_id):
+        def prepare_conjectures(statements, conjectures, content_to_id, title_to_id, type="none"):
             for title, content in statements.items():
                 if content["content"] in content_to_id:
                     matching_title = content_to_id[content["content"]]
@@ -58,6 +61,8 @@ class GenerateOutputTask(Task):
                         )
 
                         conjectures[new_id]["premises"] = filtered_premises
+                        conjectures[new_id]["category"] = content["category"]
+                        conjectures[new_id]["type"] = type
             
             return conjectures, content_to_id
 
@@ -65,41 +70,44 @@ class GenerateOutputTask(Task):
         kb = dict()
         content_kb_list = list()
         kb, title_to_idd, content_kb_list = add_elements_to_kb(
-            definitions, kb, title_to_id, content_kb_list
+            definitions, kb, title_to_id, content_kb_list, type="definitions"
         )
 
         kb, title_to_id, content_kb_list = add_elements_to_kb(
-            lemmas, kb, title_to_id, content_kb_list
+            lemmas, kb, title_to_id, content_kb_list, type="lemmas"
         )
 
         kb, title_to_id, content_kb_list = add_elements_to_kb(
-            corollaries, kb, title_to_id, content_kb_list
+            corollaries, kb, title_to_id, content_kb_list, type="corollaries"
         )
 
         kb, title_to_id, content_kb_list = add_elements_to_kb(
-            theorems, kb, title_to_id, content_kb_list
+            theorems, kb, title_to_id, content_kb_list, type="theorem"
         )
 
         conjectures = dict()
         content_to_id = dict()
         conjectures, content_to_id = prepare_conjectures(
-            theorems, conjectures, content_to_id, title_to_id
+            theorems, conjectures, content_to_id, title_to_id, type="theorem"
         )
         conjectures, content_to_id = prepare_conjectures(
-            lemmas, conjectures, content_to_id, title_to_id
+            lemmas, conjectures, content_to_id, title_to_id, type="lemma"
         )
         conjectures, content_to_id = prepare_conjectures(
-            corollaries, conjectures, content_to_id, title_to_id
+            corollaries, conjectures, content_to_id, title_to_id, type="corollaries"
         )
 
-        for title_id, content in conjectures.items():
-            premises = content["premises"]
-            added_premises = list()
-            for p in premises:
-                if p in conjectures:
-                    added_premises.extend(conjectures[p]["premises"])
-            premises.extend(added_premises)
-            conjectures[title_id]["premises"] = list(set(premises))
+
+        ## for  multi-hop settings 
+
+        # for title_id, content in conjectures.items():
+        #     premises = content["premises"]
+        #     added_premises = list()
+        #     for p in premises:
+        #         if p in conjectures:
+        #             added_premises.extend(conjectures[p]["premises"])
+        #     premises.extend(added_premises)
+        #     conjectures[title_id]["premises"] = list(set(premises))
 
         # for title_id, content in conjectures.items():
         #     premises = content["premises"]
@@ -155,11 +163,11 @@ class GenerateOutputTask(Task):
 
         s = pd.Series(data)
         training_data, test_data = [
-            i.to_dict() for i in train_test_split(s, train_size=0.5)
+            i.to_dict() for i in train_test_split(s, train_size=0.5, random_state=42)
         ]
 
         s = pd.Series(test_data)
-        dev_data, test_data = [i.to_dict() for i in train_test_split(s, train_size=0.5)]
+        dev_data, test_data = [i.to_dict() for i in train_test_split(s, train_size=0.5, random_state=42)]
 
         logger.info(f"Training Data: {len(training_data)}")
         logger.info(f"Dev Data: {len(dev_data)}")
@@ -196,6 +204,12 @@ class GenerateOutputTask(Task):
         definitions, lemmas, corollaries, theorems = self.organise_input(
             definitions, lemmas, corollaries, theorems
         )
+
+        logger.info(f"Number of definitions: {len(definitions)}")
+        logger.info(f"Number of lemmas: {len(lemmas)}")
+        logger.info(f"Number of corollaries: {len(corollaries)}")
+        logger.info(f"Number of theoms: {len(theorems)}")
+
         conjectures, kb = self.create_kb(definitions, lemmas, corollaries, theorems)
 
         train, dev, test = self.split_data(conjectures)
